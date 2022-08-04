@@ -21,20 +21,21 @@ fn convert_qr_code_to_image(qr_code: QrCode, filename: &str) {
     let code_width = qr_code.width();
     let qr_code_matrix = qr_code.into_vec();
     
-    let circle_radius: usize = 10; 
+    let circle_radius: usize = 8; 
     let image_width = circle_radius * 2 * code_width;
-    let mut buffer = RenderBuffer::new(image_width as u32, image_width as u32);
+    let border: u32 = 5;
+    let mut buffer = RenderBuffer::new(image_width as u32 + border * 2, image_width as u32 + border * 2);
 
     // Set background
     buffer.clear(BROWN);
 
     // Draw circles
-    for x in 0..code_width {
-        for y in 0..code_width {
+    for y in 0..code_width {
+        for x in 0..code_width {
             let item = code_width * y + x;
             let diameter = circle_radius * 2;
-            let centre_x = diameter * x + circle_radius;
-            let centre_y = diameter * y + circle_radius;
+            let centre_x = diameter * x + circle_radius + border as usize;
+            let centre_y = diameter * y + circle_radius + border as usize;
             println!("Code width is {}, x is {}, y is {}, item is {}", code_width, x, y, item);
             let color = if qr_code_matrix[item] {
                 BLACK
@@ -49,6 +50,7 @@ fn convert_qr_code_to_image(qr_code: QrCode, filename: &str) {
             draw_circle(&mut buffer, circle);
         }
     }
+
 
     buffer.save(filename).unwrap();
 }
