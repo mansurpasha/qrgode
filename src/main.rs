@@ -1,7 +1,8 @@
-use std::io;
-use graphics::{ellipse, types::Color};
-use graphics_buffer::{IDENTITY, RenderBuffer};
+extern crate cairo;
+
+use std::{io, fs::File, f64::consts::PI};
 use qrcode::QrCode;
+use cairo::{ImageSurface, Format, Context};
 
 fn main() {
     let mut buf = String::new();
@@ -23,11 +24,14 @@ fn convert_qr_code_to_image(qr_code: QrCode, filename: &str) {
     
     let circle_radius: usize = 8; 
     let image_width = circle_radius * 2 * code_width;
-    let border: u32 = 5;
-    let mut buffer = RenderBuffer::new(image_width as u32 + border * 2, image_width as u32 + border * 2);
+    let border: i32 = 5;
 
-    // Set background
-    buffer.clear(BROWN);
+    let surface = ImageSurface::create(Format::ARgb32, image_width as i32 + border * 2, image_width as i32 + border * 2).unwrap();
+    let context = Context::new(&surface).unwrap();
+
+    // Set background colour
+    context.set_source_rgb(BROWN.0, BROWN.1, BROWN.2);
+    context.paint().expect("Error painting to surface");
 
     // Draw circles
     for y in 0..code_width {
@@ -47,17 +51,17 @@ fn convert_qr_code_to_image(qr_code: QrCode, filename: &str) {
                 radius: circle_radius as f64,
                 color,
             };
-            draw_circle(&mut buffer, circle);
+            draw_circle(&context, circle);
         }
     }
 
-
-    buffer.save(filename).unwrap();
+    let mut file = File::create(filename).unwrap();
+    surface.write_to_png(&mut file).unwrap();
 }
 
-const BLACK: Color = [0.0, 0.0, 0.0, 1.0];
-const WHITE: Color = [0.9, 0.9, 0.9, 1.0];
-const BROWN: Color = [139.0/255.0, 69.0/255.0, 19.0/255.0, 1.0];
+const BLACK: (f64, f64, f64) = (0.0, 0.0, 0.0);
+const WHITE: (f64, f64, f64) = (0.9, 0.9, 0.9);
+const BROWN: (f64, f64, f64) = (139.0/255.0, 69.0/255.0, 19.0/255.0);
 
 struct Point {
     x: f64,
@@ -67,16 +71,15 @@ struct Point {
 struct Circle {
     centre: Point,
     radius: f64,
-    color: Color,
+    color: (f64, f64, f64),
 }
 
-fn draw_circle(buffer: &mut RenderBuffer, circle: Circle) {
+fn draw_circle(context: &Context, circle: Circle) {
     let Circle { centre, radius, color } = circle;
-    ellipse(
-        color,
-        [centre.x - circle.radius, centre.y - radius, radius * 2.0, radius * 2.0],
-        IDENTITY,
-        buffer,
-    );
+    context.set_line_width(0.02);
+    context.set_source_rgb(color.0, color.1, color.2);
+    context.arc(centre.x, centre.y, radius-0.8, 0.0, PI*2.);
+    context.fill_preserve().unwrap();
+    context.stroke().unwrap();
 }
 
