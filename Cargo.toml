@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 qrcode = "0.12.0"
-image = "0.24.3"
+graphics_buffer = "0.6.0"
+piston2d-graphics = "0.30.0"
