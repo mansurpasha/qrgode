@@ -22,9 +22,9 @@ pub fn convert_qr_code_to_image(qr_code: QrCode, filename: &str) {
     let code_width = qr_code.width();
     let qr_code_matrix = qr_code.into_vec();
     
-    let circle_radius: usize = 8; 
+    let circle_radius = 8; 
     let image_width = circle_radius * 2 * code_width;
-    let border: i32 = 5;
+    let border = 5;
 
     let surface = ImageSurface::create(
         Format::ARgb32,
@@ -44,10 +44,9 @@ pub fn convert_qr_code_to_image(qr_code: QrCode, filename: &str) {
             let diameter = circle_radius * 2;
             let centre_x = diameter * x + circle_radius + border as usize;
             let centre_y = diameter * y + circle_radius + border as usize;
-            let color = if qr_code_matrix[item] {
-                BLACK
-            } else {
-                WHITE
+            let color = match qr_code_matrix[item] {
+                true => BLACK,
+                false => WHITE,
             };
             let circle = Circle {
                 centre: Point { x: centre_x as f64, y: centre_y as f64 },

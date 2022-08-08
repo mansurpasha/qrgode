@@ -16,4 +16,3 @@ fn main() {
     render::convert_qr_code_to_image(code, "output.png");
 }
 
-
