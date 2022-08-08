@@ -9,6 +9,6 @@ Convert strings to QRCodes like look like positions on a Go board
 
 ## Usage
 
-Run `cargo run` and enter a string to convert to a QRCode. The image produced is saved to "output.png".
+Just run `./qrgode` and enter a string when prompted. The image produced is saved to "output.png".
 
 If you're having trouble scanning the codes, you may have to zoom out/scan them from further away.
